@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from django.db.models import Q
 from rest_framework.parsers import MultiPartParser, FormParser
 import pandas as pd
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from .models import Book,Library
 from .serializers import BookSerializer,LibrarySearchSerializer
@@ -20,11 +21,13 @@ class BookListCreateAPIView(APIView):
 
     @swagger_auto_schema(request_body=BookSerializer)
     def post(self, request):
-        serializer = BookSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_authenticated:
+            serializer = BookSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(library=request.user.library)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status":False,"detail":"Not authenticated"})
 
 class BookDetailAPIView(APIView):
     def get(self, request, pk):
@@ -38,26 +41,29 @@ class BookDetailAPIView(APIView):
         
     @swagger_auto_schema(request_body=BookSerializer)
     def put(self, request, pk):
-        try:
-            book = Book.objects.get(pk=pk)
-        except Book.DoesNotExist:
-            return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if request.user.is_authenticated:
+            try:
+                book = Book.objects.get(pk=pk)
+            except Book.DoesNotExist:
+                return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = BookSerializer(book, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = BookSerializer(book, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status":False,"detail":"Not authenticated"})
 
     def delete(self, request, pk):
-        try:
-            book = Book.objects.get(pk=pk)
-        except Book.DoesNotExist:
-            return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            if request.user.is_authenticated:
+                try:
+                    book = Book.objects.get(pk=pk)
+                except Book.DoesNotExist:
+                    return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        book.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+                book.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"status":False,"detail":"Not authenticated"})
 
 class SearchBooksAPIView(APIView):
     @swagger_auto_schema(
@@ -87,6 +93,7 @@ class SearchBooksAPIView(APIView):
     
 class UploadExcelAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
         operation_description="Excel fayl yuklash va kitoblarni JSON formatida qaytarish",
         manual_parameters=[
@@ -136,6 +143,7 @@ class UploadExcelAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class AddBooksAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=BookSerializer)
     def post(self, request, *args, **kwargs):
         books = request.data.get('books', [])
@@ -145,6 +153,6 @@ class AddBooksAPIView(APIView):
 
         serializer = BookSerializer(data=books, many=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response({"status":False,"detail": "Books saved successfully"}, status=status.HTTP_201_CREATED)
+            serializer.save(library=request.user.library)
+            return Response({"status":True,"detail": "Books saved successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

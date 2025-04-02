@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from django.db.models import Sum
+from rest_framework.permissions import IsAdminUser
 
 from app_auth.models import Library
 from app_auth.serializers import LibrarySerializer
@@ -20,6 +21,7 @@ class LibraryListCreateAPIView(APIView):
             books_count = library.books.aggregate(total=Sum('quantity_in_library'))['total'] or 0
 
             data.append({
+                "id":library.id,
                 "name": library.user.name,
                 "image":library.image.url if library.image else None,
                 "address":library.address,
@@ -55,25 +57,31 @@ class LibraryDetailAPIView(APIView):
 
         except Library.DoesNotExist:
             return Response({"status":False,"detail": "Library not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-    @swagger_auto_schema(request_body=LibrarySerializer)
-    def put(self, request, pk):
-        try:
-            library = Library.objects.get(pk=pk)
-        except Library.DoesNotExist:
-            return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = LibrarySerializer(library, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        try:
-            library = Library.objects.get(pk=pk)
-        except Library.DoesNotExist:
-            return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if request.user.is_authenticated:
+            if request.user.is_admin or request.user.is_staff:
+                try:
+                    library = Library.objects.get(pk=pk)
+                except Library.DoesNotExist:
+                    return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        library.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+                library.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            
+            return Response({"status":False,"detail":"This is for admins only"})
+        return Response({"status":False,"detail":"Not authenticated"})
+    
+class ActivateLibraryAPIView(APIView):
+    permission_classes = [IsAdminUser]
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            library = Library.objects.get(id=pk)
+        except Library.DoesNotExist:
+            return Response({"status":False,"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Kutubxona profilini faollashtirish (aktiv qilish)
+        library.user.is_active = True
+        library.user.save()
+
+        return Response({"status":False,"detail": "Library activate successul."}, status=status.HTTP_200_OK)
