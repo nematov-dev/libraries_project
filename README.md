@@ -2,57 +2,57 @@
 
 ## Authentication
 
-- **POST** `/auth/login/`  
+- **POST** `api/v1/auth/login/`  
   Login to the system.
 
-- **POST** `/auth/logout/`  
+- **POST** `api/v1/auth/logout/`  
   Logout from the system.
 
-- **GET** `/auth/profile/`  
+- **GET** `api/v1/auth/profile/`  
   View the profile details of the logged-in user.
 
-- **PATCH** `/auth/profile/`  
+- **PATCH** `api/v1/auth/profile/`  
   Partially update the profile of the logged-in user.
 
-- **POST** `/auth/register-library/`  
+- **POST** `api/v1/auth/register-library/`  
   Register a new library.
 
 ## Books
 
-- **GET** `/books/book/{id}/`  
+- **GET** `api/v1/books/book/{id}/`  
   Retrieve details of a single book.
 
-- **PUT** `/books/book/{id}/`  
+- **PUT** `api/v1/books/book/{id}/`  
   Update the details of a specific book (for admin and library staff only).
 
-- **DELETE** `/books/book/{id}/`  
+- **DELETE** `api/v1/books/book/{id}/`  
   Delete a specific book (for admin and library staff only).
 
-- **GET** `/books/books/`  
+- **GET** `api/v1/books/books/`  
   Retrieve a list of all books.
 
-- **POST** `/books/books/`  
+- **POST** `api/v1/books/books/`  
   Add a new book (for admin and library staff only).
 
-- **GET** `/books/search/book/`  
+- **GET** `api/v1/books/search/book/`  
   Search for books based on query parameters.
 
-- **POST** `/books/upload-excel/`  
+- **POST** `api/v1/books/upload-excel/`  
   Upload an Excel file and return the list of books from the file (for admin and library staff only).
 
-- **POST** `/books/add-books/`  
+- **POST** `api/v1/books/add-books/`  
   Add books from the list extracted from an Excel file (for admin and library staff only).
 
 ## Libraries
 
-- **GET** `/libraries/libraries/`  
+- **GET** `api/v1/libraries/libraries/`  
   Retrieve a list of all libraries.
 
-- **PATCH** `/libraries/library/activate/{id}/`  
+- **PATCH** `api/v1/libraries/library/activate/{id}/`  
   Activate a library (for admin only).
 
-- **GET** `/libraries/library/{id}/`  
+- **GET** `api/v1/libraries/library/{id}/`  
   Retrieve details of a specific library.
 
-- **DELETE** `/libraries/library/{id}/`  
+- **DELETE** `api/v1/libraries/library/{id}/`  
   Delete a specific library (for admin only).

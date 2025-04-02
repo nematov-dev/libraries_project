@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #004080;
+        }
+        pre {
+            background: #e6f2ff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center">API Documentation</h1>
+
+        <h2>Authentication APIs</h2>
+        <pre>Authentication
+
+            - POST api/v1/auth/login/  
+              Login to the system.
+            
+            - POST api/v1/auth/logout/  
+              Logout from the system.
+            
+            - GET api/v1/auth/profile/  
+              View the profile details of the logged-in user.
+            
+            - PATCH api/v1/auth/profile/  
+              Partially update the profile of the logged-in user.
+            
+            - POST api/v1/auth/register-library/  
+              Register a new library.</pre>
+
+        <h2>Books APIs</h2>
+        <pre>- GET api/v1/books/book/{id}/  
+            Retrieve details of a single book.
+          
+          - PUT api/v1/books/book/{id}/  
+            Update the details of a specific book (for admin and library staff only).
+          
+          - DELETE api/v1/books/book/{id}/  
+            Delete a specific book (for admin and library staff only).
+          
+          - GET api/v1/books/books/  
+            Retrieve a list of all books.
+          
+          - POST api/v1/books/books/  
+            Add a new book (for admin and library staff only).
+          
+          - GET api/v1/books/search/book/  
+            Search for books based on query parameters.
+          
+          - POST api/v1/books/upload-excel/  
+            Upload an Excel file and return the list of books from the file (for admin and library staff only).
+          
+          - POST api/v1/books/add-books/  
+            Add books from the list extracted from an Excel file (for admin and library staff only).</pre>
+
+        <h2>Libraries APIs</h2>
+        <pre>- GET api/v1/libraries/libraries/  
+            Retrieve a list of all libraries.
+          
+          - PATCH api/v1/libraries/library/activate/{id}/  
+            Activate a library (for admin only).
+          
+          - GET api/v1/libraries/library/{id}/  
+            Retrieve details of a specific library.
+          
+          - DELETE api/v1/libraries/library/{id}/  
+            Delete a specific library (for admin only).</pre>
+
+        <h2>Notes</h2>
+        <p>
+<strong>- {id} should be replaced with the actual ID of the resource.
+- Use appropriate HTTP methods (GET, POST, PUT, DELETE) as per the endpoint.
+- Ensure authentication for protected routes.</strong></p>
+        <h2>Contact</h2>
+        <p><strong>For further questions, contact the developer: <a href="https://nematov.uz" target="_blank">nematov.uz</a></strong></p>
+    </div>
+</body>
+</html>
