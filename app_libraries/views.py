@@ -84,4 +84,4 @@ class ActivateLibraryAPIView(APIView):
         library.user.is_active = True
         library.user.save()
 
-        return Response({"status":False,"detail": "Library activate successul."}, status=status.HTTP_200_OK)
+        return Response({"status":True,"detail": "Library activate successul."}, status=status.HTTP_200_OK)
