@@ -25,12 +25,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'drf_yasg',
+    'corsheaders',
 
     'app_auth',
     'app_books',
     'app_libraries',
-    'app_maps',
-    'app_stats',
 ]
 
 MIDDLEWARE = [
@@ -98,6 +97,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
@@ -117,6 +118,11 @@ SWAGGER_SETTINGS = {
     },
     "USE_SESSION_AUTH": False,  # Django login orqali autentifikatsiyani o‘chiradi
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    # Agar telefon orqali login qilish uchun o'zgartirgan bo'lsangiz, bu backend qo'shilgan bo'lishi kerak
+]
 
 AUTH_USER_MODEL = 'app_auth.User'
 

@@ -25,8 +25,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #auth
     path('api/v1/auth/',include('app_auth.urls')),
+    #book
+    path('api/v1/books/',include('app_books.urls')),
+    #library
+    path('api/v1/libraries/',include('app_libraries.urls')),
     #swagger
-    path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

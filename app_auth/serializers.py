@@ -20,7 +20,7 @@ class LibraryProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id","password","full_name","phone")
+        fields = ("id","password","name","phone")
     
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
@@ -28,9 +28,15 @@ class UserSerializer(serializers.ModelSerializer):
     
 class LibrarySerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+    google_maps_url = serializers.SerializerMethodField()
     class Meta:
         model = Library
-        fields = ('id','user','name','image','address','social_media','can_rent_books')
+        fields = ('id','user','image','address','social_media','can_rent_books','latitude', 'longitude','google_maps_url')
+
+    def get_google_maps_url(self, obj):
+        if obj.latitude and obj.longitude:
+            return f"https://www.google.com/maps?q={obj.latitude},{obj.longitude}"
+        return None
 
 class UserAndLibrarySerializer(serializers.Serializer):
     user = UserSerializer()
