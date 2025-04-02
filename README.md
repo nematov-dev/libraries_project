@@ -49,7 +49,7 @@
   Retrieve a list of all libraries.
 
 - **PATCH** `/libraries/library/activate/{id}/`  
-  Activate a library (for admin and library staff only).
+  Activate a library (for admin only).
 
 - **GET** `/libraries/library/{id}/`  
   Retrieve details of a specific library.
