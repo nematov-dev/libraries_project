@@ -10,15 +10,18 @@ from app_auth.models import Library
 from app_auth.serializers import LibrarySerializer
 from app_books.serializers import BookSerializer
 from app_books.paginations import BookPagination
+from app_libraries.serializers import LibraryStatusSerializer
 
 
 class LibraryListCreateAPIView(APIView):
+    permission_classes = [IsAdminUser]
+    
     def get(self, request, *args, **kwargs):
         libraries = Library.objects.all()
         data = []
 
         for library in libraries:
-            books_count = library.books.aggregate(total=Sum('quantity_in_library'))['total'] or 0
+            books_count = library.books.count()
 
             data.append({
                 "id":library.id,
@@ -58,21 +61,28 @@ class LibraryDetailAPIView(APIView):
         except Library.DoesNotExist:
             return Response({"status":False,"detail": "Library not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request, pk):
-        if request.user.is_authenticated:
-            if request.user.is_admin or request.user.is_staff:
-                try:
-                    library = Library.objects.get(pk=pk)
-                except Library.DoesNotExist:
-                    return Response({"status":False,"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-                library.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            
-            return Response({"status":False,"detail":"This is for admins only"})
-        return Response({"status":False,"detail":"Not authenticated"})
     
 class ActivateLibraryAPIView(APIView):
+    permission_classes = [IsAdminUser]
+    @swagger_auto_schema(request_body=LibraryStatusSerializer)
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            library = Library.objects.get(id=pk)
+        except Library.DoesNotExist:
+            return Response({"status":False,"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serializerni yaratish va requestdan is_active qiymatini olish
+        serializer = LibraryStatusSerializer(data=request.data)
+        if serializer.is_valid():
+            # is_active qiymatiga qarab faollashtirish yoki faollasizlantirish
+            library.user.is_active = serializer.validated_data['is_active']
+            library.user.save()
+
+            return Response({"status": True, "detail": "Library deactivate successful."}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class DeactivateLibraryAPIView(APIView):
     permission_classes = [IsAdminUser]
     def patch(self, request, pk, *args, **kwargs):
         try:
@@ -80,8 +90,9 @@ class ActivateLibraryAPIView(APIView):
         except Library.DoesNotExist:
             return Response({"status":False,"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Kutubxona profilini faollashtirish (aktiv qilish)
-        library.user.is_active = True
+        # Kutubxona profilini faolsizlantirish
+        library.user.is_active = False
         library.user.save()
 
-        return Response({"status":True,"detail": "Library activate successul."}, status=status.HTTP_200_OK)
+        return Response({"status":True,"detail": "Library deactivate successul."}, status=status.HTTP_200_OK)
+    
