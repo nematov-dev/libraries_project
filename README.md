@@ -51,8 +51,8 @@
 - **PATCH** `api/v1/libraries/library/activate/{id}/`  
   Activate a library (for admin only).
 
+- **DELETE** `api/v1/libraries/library/deactivate/{id}/`  
+  Deactivate a library (for admin only).
+
 - **GET** `api/v1/libraries/library/{id}/`  
   Retrieve details of a specific library.
-
-- **DELETE** `api/v1/libraries/library/{id}/`  
-  Delete a specific library (for admin only).
