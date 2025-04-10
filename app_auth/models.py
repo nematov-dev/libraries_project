@@ -60,8 +60,8 @@ class Library(models.Model):
     social_media = models.JSONField(blank=True, null=True)  # Masalan, {"telegram": "t.me/library", "instagram": "@library"}
     can_rent_books = models.BooleanField(default=False)
 
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=60, decimal_places=50, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=60, decimal_places=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.address and (self.latitude is None or self.longitude is None):
