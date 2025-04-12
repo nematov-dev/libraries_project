@@ -39,7 +39,6 @@ class CreateLibraryAPIView(APIView):
             user.delete()
             return Response(library_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-
 class LoginAPIView(APIView):
     @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
@@ -48,20 +47,20 @@ class LoginAPIView(APIView):
 
         user = User.objects.filter(phone=phone).first()
 
-        try:
-            if not user.is_active:
-                return Response({"status":False,"detail": "Your account is not active."}, status=status.HTTP_401_UNAUTHORIZED)
-            if user and user.check_password(password):
+        if not user:
+            return Response({"status": False, "detail": "Phone number not found"}, status=status.HTTP_404_NOT_FOUND)
 
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                })
-        except user.DoesNotExist:
-            return Response({"status":False,"detail":"Phone number not found"},status=status.HTTP_404_NOT_FOUND)
-        
-        return Response({"status":False,"detail": "The phone number or password is incorrect"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user.is_active:
+            return Response({"status": False, "detail": "Your account is not active."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if user.check_password(password):
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            })
+
+        return Response({"status": False, "detail": "The phone number or password is incorrect"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
