@@ -138,21 +138,21 @@ class UploadExcelAPIView(APIView):
         try:
             df = pd.read_excel(file)  # Excel faylni o‘qish
             books = df.to_dict(orient='records')  # Listga o‘tkazish
-            return Response({"books": books}, status=status.HTTP_200_OK)
+            return Response(books, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class AddBooksAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(request_body=BookSerializer)
+
+    @swagger_auto_schema(request_body=BookSerializer(many=True))
     def post(self, request, *args, **kwargs):
-        books = request.data.get('books', [])
-
-        if not books:
-            return Response({"status":False,"detail": "The list of books is empty"}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = BookSerializer(data=books, many=True)
+        # request.data - bu list bo'lishi kerak
+        serializer = BookSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save(library=request.user.library)
-            return Response({"status":True,"detail": "Books saved successfully"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"status": True, "detail": "Books saved successfully"},
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

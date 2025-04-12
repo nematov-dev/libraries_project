@@ -14,7 +14,6 @@ from app_libraries.serializers import LibraryStatusSerializer
 
 
 class LibraryListCreateAPIView(APIView):
-    permission_classes = [IsAdminUser]
     
     def get(self, request, *args, **kwargs):
         libraries = Library.objects.all()
@@ -78,7 +77,7 @@ class ActivateLibraryAPIView(APIView):
             library.user.is_active = serializer.validated_data['is_active']
             library.user.save()
 
-            return Response({"status": True, "detail": "Library deactivate successful."}, status=status.HTTP_200_OK)
+            return Response({"status": True, "detail": "Library activate successful."}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
