@@ -27,7 +27,7 @@ class BookListCreateAPIView(APIView):
                 serializer.save(library=request.user.library)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"status":False,"detail":"Not authenticated"})
+        return Response({"status":False,"detail":"Not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
 
 class BookDetailAPIView(APIView):
     def get(self, request, pk):
@@ -52,7 +52,7 @@ class BookDetailAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"status":False,"detail":"Not authenticated"})
+        return Response({"status":False,"detail":"Not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request, pk):
             if request.user.is_authenticated:
@@ -63,7 +63,7 @@ class BookDetailAPIView(APIView):
 
                 book.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({"status":False,"detail":"Not authenticated"})
+            return Response({"status":False,"detail":"Not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
 
 class SearchBooksAPIView(APIView):
     @swagger_auto_schema(
