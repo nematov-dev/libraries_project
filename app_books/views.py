@@ -93,7 +93,7 @@ class SearchBooksAPIView(APIView):
     
 class UploadExcelAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
         operation_description="Excel fayl yuklash va kitoblarni JSON formatida qaytarish",
         manual_parameters=[

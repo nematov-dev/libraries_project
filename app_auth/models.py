@@ -70,9 +70,8 @@ class Library(models.Model):
 
     def get_coordinates(self):
         """Google Maps API orqali manzil asosida koordinatalarni olish"""
-        API_KEY = config("API_KEY")
         base_url = "https://maps.googleapis.com/maps/api/geocode/json"
-        params = {"address": self.address, "key": API_KEY}
+        params = {"address": self.address}
         response = requests.get(base_url, params=params)
         data = response.json()
 
