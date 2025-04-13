@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,10 +15,8 @@ ALLOWED_HOSTS = ['s-libraries.uz','www.s-libraries.uz','127.0.0.1']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_HEADERS = [
-    'content-type',
-    'authorization',
-    'x-csrftoken',
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-auth-token',
 ]
 
 # Application definition
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
