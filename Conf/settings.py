@@ -1,7 +1,6 @@
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
-from corsheaders.defaults import default_headers
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,10 +12,11 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['s-libraries.uz','www.s-libraries.uz','127.0.0.1']
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'x-auth-token',
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*$",  # istalgan HTTPS frontend
+    r"^http://localhost:\d+$",  # local dev uchun
 ]
 
 # Application definition
