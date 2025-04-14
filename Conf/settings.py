@@ -12,7 +12,7 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['s-libraries.uz','www.s-libraries.uz','127.0.0.1']
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*$",  # istalgan HTTPS frontend
