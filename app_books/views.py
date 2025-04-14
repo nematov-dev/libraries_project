@@ -10,7 +10,7 @@ import pandas as pd
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from .models import Book,Library
-from .serializers import BookSerializer,LibrarySearchSerializer
+from .serializers import BookSerializer,BookSearchSerializer
 
 
 class BookListCreateAPIView(APIView):
@@ -80,15 +80,12 @@ class SearchBooksAPIView(APIView):
         query = request.query_params.get('q', '')
         if not query:
             return Response({"status":False,"detail": "No search query entered"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         # Kitob nomi yoki muallif bo‘yicha qidirish
         books = Book.objects.filter(Q(name__icontains=query) | Q(author__icontains=query))
 
-        # Kitob joylashgan kutubxonalarni topish
-        library_ids = books.values_list('library', flat=True).distinct()
-        libraries = Library.objects.filter(id__in=library_ids)
-
-        data = LibrarySearchSerializer(libraries, many=True).data
+        # Kitoblarni serialize qilish
+        data = BookSearchSerializer(books, many=True).data
         return Response(data, status=status.HTTP_200_OK)
     
 class UploadExcelAPIView(APIView):

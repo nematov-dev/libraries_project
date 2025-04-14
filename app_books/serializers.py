@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 
 from .models import Book,Library
+from app_auth.serializers import LibrarySerializer
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -10,8 +11,8 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = ('id','library','name', 'author', 'publisher', 'quantity_in_library')
 
-class LibrarySearchSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='user.name',read_only=True)
+class BookSearchSerializer(serializers.ModelSerializer):
+    library = LibrarySerializer()
     class Meta:
-        model = Library
-        fields = ('id','name','address')
+        model = Book
+        fields = ('id','name', 'author', 'publisher', 'quantity_in_library','library')
