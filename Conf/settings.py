@@ -10,14 +10,9 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG')
 
-ALLOWED_HOSTS = ['s-libraries.uz','www.s-libraries.uz','127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
-CORS_ALLOW_ALL_ORIGINS = False
-
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*$",  # istalgan HTTPS frontend
-    r"^http://localhost:\d+$",  # local dev uchun
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
