@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kitoblar API Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    input, button { margin: 5px 0; padding: 8px; width: 100%; max-width: 300px; }
+    .book { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+
+  <h1>📚 Kitoblar API Test</h1>
+
+  <!-- Login qismi -->
+  <section>
+    <h2>🔐 Login</h2>
+    <input type="text" id="phone" placeholder="Telefon raqam" />
+    <input type="password" id="password" placeholder="Parol" />
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+  </section>
+
+  <hr />
+
+  <!-- Kitoblar ro'yxati -->
+  <section>
+    <h2>📖 Kitoblar roʻyxati</h2>
+    <button onclick="getBooks()">Kitoblarni yuklash</button>
+    <div id="booksList"></div>
+  </section>
+
+  <script>
+    // Login funksiyasi
+    function login() {
+      const phone = document.getElementById("phone").value;
+      const password = document.getElementById("password").value;
+
+      fetch('https://s-libraries.uz/api/v1/auth/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.access) {
+          localStorage.setItem("accessToken", data.access);
+          alert("✅ Login muvaffaqiyatli!");
+        } else {
+          alert("❌ Login xato: noto‘g‘ri ma'lumot");
+        }
+      })
+      .catch(err => {
+        console.error("Xato:", err);
+        alert("❌ Login bajarilmadi.");
+      });
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem("accessToken");
+      alert("🚪 Chiqdingiz.");
+    }
+
+    // Kitoblarni yuklash
+    function getBooks() {
+      fetch("https://s-libraries.uz/api/v1/books/books/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+          // Token kerak emas, shuning uchun Authorization yuborilmaydi
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Server javobi: " + res.status);
+        return res.json();
+      })
+      .then(data => {
+        const booksDiv = document.getElementById("booksList");
+        booksDiv.innerHTML = "";
+
+        if (data.length === 0) {
+          booksDiv.innerHTML = "<p>📭 Hozircha kitoblar yo‘q.</p>";
+          return;
+        }
+
+        data.forEach(book => {
+          const div = document.createElement("div");
+          div.className = "book";
+          div.innerHTML = `
+            <strong>${book.title}</strong><br/>
+            Muallif: ${book.author || "Noma'lum"}<br/>
+            Yil: ${book.year || "—"}
+          `;
+          booksDiv.appendChild(div);
+        });
+      })
+      .catch(err => {
+        document.getElementById("booksList").innerHTML =
+          `<p style="color:red;">❌ Xatolik: ${err.message}</p>`;
+      });
+    }
+  </script>
+
+</body>
+</html>
