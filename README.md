@@ -56,3 +56,6 @@
 
 - **GET** `api/v1/libraries/library/{id}/`  
   Retrieve details of a specific library.
+  
+- **GET** `api/v1/libraries/library/books/`  
+  List of library books.

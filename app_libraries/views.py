@@ -4,13 +4,14 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from django.db.models import Sum
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser,IsAuthenticated
 
 from app_auth.models import Library
 from app_auth.serializers import LibrarySerializer
 from app_books.serializers import BookSerializer
 from app_books.paginations import BookPagination
 from app_libraries.serializers import LibraryStatusSerializer
+from app_books.models import Book
 
 
 class LibraryListCreateAPIView(APIView):
@@ -95,3 +96,27 @@ class DeactivateLibraryAPIView(APIView):
 
         return Response({"status":True,"detail": "Library deactivate successul."}, status=status.HTTP_200_OK)
     
+class LibraryBooksAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        if not user.is_librarian:
+            return Response(
+                {"status": False, "detail": "You do not have permission to perform this action."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if not hasattr(user, 'library'):
+            return Response(
+                {"status": False, "detail": "Library not found for this user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        books = Book.objects.filter(library=user.library)
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
+
+        
+        
