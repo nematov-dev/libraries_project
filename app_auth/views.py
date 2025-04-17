@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import permissions
 
 
-from .serializers import UserAndLibrarySerializer,UserSerializer,LibrarySerializer,LoginSerializer,LibraryProfileSerializer
+from .serializers import UserAndLibrarySerializer,UserSerializer,LibrarySerializer,LoginSerializer,LibraryProfileSerializer,UserProfileSerializer
 from .models import Library
 
 User = get_user_model()
@@ -78,28 +78,70 @@ class LibraryProfileAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        """Kutubxona profilini olish, agar bo‘lmasa, `None` qaytarish."""
-        return Library.objects.first()
+        """
+        Library modeldan o‘z profilini qidiradi.
+        """
+        user = self.request.user
+        try:
+            return Library.objects.get(user=user)  # Faqat o‘ziga tegishli profil
+        except Library.DoesNotExist:
+            return None
 
     def get(self, request):
-        """Kutubxona profilini olish"""
+        """Profilni olish"""
         profile = self.get_object()
         if not profile:
-            return Response({"status":False,"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"status": False, "detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = LibraryProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=LibraryProfileSerializer)
     def patch(self, request):
-        """Kutubxona profilini yangilash"""
+        """Profilni yangilash"""
         profile = self.get_object()
         if not profile:
-            return Response({"status":False,"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({"status": False, "detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        
         serializer = LibraryProfileSerializer(profile, data=request.data, partial=True)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AdminProfileAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_object(self):
+        """
+        User modeldan o‘z profilini qidiradi.
+        """
+        user = self.request.user
+        try:
+            return User.objects.get(id=user.id)  # Faqat o‘ziga tegishli profil
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request):
+        """Profilni olish"""
+        profile = self.get_object()
+        if not profile:
+            return Response({"status": False, "detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body=UserProfileSerializer)
+    def patch(self, request):
+        """Profilni yangilash"""
+        profile = self.get_object()
+        if not profile:
+            return Response({"status": False, "detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
