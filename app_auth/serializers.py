@@ -32,6 +32,22 @@ class LibraryProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['created', 'updated']
         
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+
+        # Update Library fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update related User fields
+        if user_data:
+            user = instance.user  # Bog'langan user
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+            user.save()
+
+        return instance
     
     
 class LibrarySerializer(serializers.ModelSerializer):
