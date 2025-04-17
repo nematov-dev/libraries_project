@@ -11,12 +11,6 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ("phone","password")
 
-class LibraryProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Library
-        fields = '__all__'
-        read_only_fields = ['created', 'updated','user']
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -30,6 +24,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id","name","phone")
+
+class LibraryProfileSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    class Meta:
+        model = Library
+        fields = '__all__'
+        read_only_fields = ['created', 'updated']
+        
+    
     
 class LibrarySerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -41,6 +44,7 @@ class LibrarySerializer(serializers.ModelSerializer):
     def get_google_maps_url(self, obj):
         if obj.latitude and obj.longitude:
             return f"https://www.google.com/maps?q={obj.latitude},{obj.longitude}"
+        
         return None
 
 class UserAndLibrarySerializer(serializers.Serializer):
